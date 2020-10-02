@@ -5,8 +5,27 @@ from django.contrib.auth.models import User, auth
 # Create your views here.
 
 
+def login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        
+        user = auth.authenticate(username = username,password = password)
+        if user is not None:
+            auth.login(request,user)
+            return redirect('home')
+        else:
+            messages.info(request,"invalid credintial")
+        return redirect('login')
+    return render(request, 'app/login.html')
+            
+
+def logout(request):  
+     return render(request,'app/logout.html')
+
+
 def home(request):
-    return render(request, 'app/home.html')
+    return render(request,'app/home.html')
 
 
 def register(request):
@@ -27,10 +46,11 @@ def register(request):
                 user = User.objects.create_user(username=username, password=password1,email=email, first_name=first_name, last_name=last_name)
                 user.save()
                 messages.info(request,' Created Succefully !!')
+                return redirect('login')
         else:
             messages.info(request,'PassWord Not Matching !!')
         return redirect('registration')
+    return render(request, 'app/register.html')
             
         
 
-    return render(request, 'app/register.html')
